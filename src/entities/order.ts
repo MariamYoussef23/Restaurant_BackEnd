@@ -11,7 +11,7 @@ export class Order extends MainEntity {
     lastName: string;
   
     @Column()
-    mobileNo: number;
+    mobile: string;
   
     @Column()
     city: string;
@@ -22,6 +22,9 @@ export class Order extends MainEntity {
     @Column()
     @Generated("uuid")
     orderNo: number;
+
+    @Column({default: false})
+    completed: boolean;
 
   @OneToMany(() => OrderLine, (orderLine) => orderLine.order)
   orderLines: OrderLine[];

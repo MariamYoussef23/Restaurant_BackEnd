@@ -7,13 +7,13 @@ const router = Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { firstName, lastName, mobileNo, city, address, orderLines } =
+    const { firstName, lastName, mobile, city, address, orderLines} =
       req.body;
 
     const order = Order.create({
       firstName,
       lastName,
-      mobileNo,
+      mobile,
       city,
       address,
     });
@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 
     for (let i = 0; i < orderLines.length; i++) {
       const product = await Product.findOne({
-        where: { id: orderLines[i].productId },
+        where: { id: orderLines[i].id },
       });
       if (!product)
         return res
@@ -60,9 +60,24 @@ export default router;
 
 router.get("/", async (req, res) => {
   try {
-    const orders = await Order.find({ relations: { orderLines: true } });
+    const orders = await Order.find({ relations: { orderLines: {product: true}}});
     res.json({ data: orders });
   } catch (error) {
     res.status(500).json({ message: error });
   }
 });
+
+router.patch("/:id", async (req,res) => {
+  try{
+    const id = +req.params.id;
+    const order = await Order.findOne({where: {id}})
+    
+    order!.completed = true
+    
+    await order!.save()
+    res.json({ data: order });
+
+  }catch(error) {
+    res.status(500).json({ message: error });
+  }
+})
